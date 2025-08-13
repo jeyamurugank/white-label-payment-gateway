@@ -1,0 +1,5 @@
+
+apiVersion: v2
+name: payment-gateway
+description: Helm chart for Payment Gateway API with Vault integration
+version: 0.1.0

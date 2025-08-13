@@ -1,0 +1,50 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-gateway-api
+  labels:
+    app: payment-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: payment-gateway
+  template:
+    metadata:
+      labels:
+        app: payment-gateway
+      annotations:
+        # Vault Agent Injector annotations (example - requires Vault Agent Injector controller)
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "payment-gateway-role"
+        vault.hashicorp.com/agent-inject-secret-razorpay: "secret/data/payment_gateway/providers/razorpay"
+        vault.hashicorp.com/agent-inject-template-razorpay: |
+          {{- with secret "secret/data/payment_gateway/providers/razorpay" -}}
+          RZP_KEY_ID={{ .Data.data.key_id }}
+          RZP_KEY_SECRET={{ .Data.data.key_secret }}
+          {{- end -}}
+        # Injected token as file (if using token)
+        vault.hashicorp.com/agent-inject-token: "true"
+    spec:
+      serviceAccountName: payment-gateway-sa
+      containers:
+      - name: api
+        image: your-registry/payment-gateway:latest
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - secretRef:
+            name: vault-secrets-injected # optional if using CSI driver/mappings
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+      # If using Vault Agent sidecar (instead of injector)
+      # - name: vault-agent
+      #   image: hashicorp/vault-k8s:latest
+      #   args: ["agent", "-config=/etc/vault/agent-config.hcl"]

@@ -1,0 +1,1 @@
+import { Controller, Get } from '@nestjs/common';@Controller('metrics')export class MetricsController{@Get()text(){const m=['# HELP pgw_uptime_seconds Uptime seconds','# TYPE pgw_uptime_seconds gauge',`pgw_uptime_seconds ${process.uptime()}`];return m.join('\n')+'\n';}}

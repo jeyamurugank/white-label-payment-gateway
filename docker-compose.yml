@@ -1,0 +1,31 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: pgpass
+      POSTGRES_DB: payments_db
+    ports: ['5432:5432']
+    volumes:
+      - ./infra/flyway/sql:/flyway/sql:ro
+      - ./pgdata:/var/lib/postgresql/data
+  flyway:
+    image: flyway/flyway:9.16.1
+    command: -url=jdbc:postgresql://postgres:5432/payments_db -user=pguser -password=pgpass -locations=filesystem:/flyway/sql migrate
+    volumes:
+      - ./infra/flyway/sql:/flyway/sql:ro
+    depends_on:
+      - postgres
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://pguser:pgpass@postgres:5432/payments_db
+      JWT_SECRET: change_me
+    ports:
+      - '3000:3000'
+    depends_on:
+      - postgres
+      - flyway
+volumes:
+  pgdata: {}

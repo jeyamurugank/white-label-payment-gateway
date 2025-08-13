@@ -1,0 +1,23 @@
+
+name: Create Partition Indexes (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'target (staging|prod)'
+        required: true
+        default: staging
+
+jobs:
+  create-indexes:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run concurrent index creation script (production only - manual)
+        env:
+          DATABASE_URL: postgresql://${{ secrets.PROD_PG_USER }}:${{ secrets.PROD_PG_PASSWORD }}@${{ secrets.PROD_PG_HOST }}:${{ secrets.PROD_PG_PORT }}/payments_db
+        run: |
+          echo "Running create_indexes_concurrently.sql via psql"
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f infra/db_maintenance/create_indexes_concurrently.sql

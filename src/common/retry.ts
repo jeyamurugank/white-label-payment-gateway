@@ -1,0 +1,1 @@
+export async function retry(fn, attempts = 3, baseDelay = 300){ let attempt = 0; while(true){ try { return await fn(); } catch(err){ attempt++; if(attempt >= attempts) throw err; await new Promise(r=>setTimeout(r, baseDelay * Math.pow(2, attempt-1))); } } }

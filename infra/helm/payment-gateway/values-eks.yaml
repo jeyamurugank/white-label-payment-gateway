@@ -1,0 +1,14 @@
+
+replicaCount: 3
+service:
+  type: LoadBalancer
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+podAnnotations: {}
+vault:
+  enabled: true
+  injector: true
+  role: payment-gateway-role
+redis:
+  enabled: true
+  url: redis://payment-redis-master:6379

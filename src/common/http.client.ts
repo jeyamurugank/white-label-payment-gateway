@@ -1,0 +1,1 @@
+import fetch from 'node-fetch';export class HttpClient { async request(url:any, init?:any){ const res = await fetch(url, init); const text = await res.text(); try { return text ? JSON.parse(text) : {}; } catch { return { raw: text }; } } }

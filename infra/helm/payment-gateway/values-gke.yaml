@@ -1,0 +1,13 @@
+
+replicaCount: 3
+service:
+  type: LoadBalancer
+  annotations:
+    cloud.google.com/load-balancer-type: "External"
+vault:
+  enabled: true
+  injector: true
+  role: payment-gateway-role
+redis:
+  enabled: true
+  url: redis://payment-redis-master:6379

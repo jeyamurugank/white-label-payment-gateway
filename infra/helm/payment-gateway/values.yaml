@@ -1,0 +1,19 @@
+
+replicaCount: 2
+image:
+  repository: your-registry/payment-gateway
+  tag: latest
+serviceAccount:
+  create: true
+  name: payment-gateway-sa
+vault:
+  enabled: true
+  injector: true
+  role: payment-gateway-role
+  secrets:
+    - name: razorpay
+      path: secret/data/payment_gateway/providers/razorpay
+    - name: cashfree
+      path: secret/data/payment_gateway/providers/cashfree
+    - name: payu
+      path: secret/data/payment_gateway/providers/payu
